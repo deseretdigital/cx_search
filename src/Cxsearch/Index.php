@@ -2,15 +2,16 @@
 
 namespace Cxsearch;
 
+use Cxsearch\Document;
 use Buzz\Browser;
 
 class Index {
     private $baseUrl;
-    private $index;
+    private $id;
 
-    public function __construct($index)
+    public function __construct($id)
     {
-        $this->index = $index;
+        $this->id = $id;
     }
 
     public function setBaseUrl($url)
@@ -23,13 +24,31 @@ class Index {
         return $this->baseUrl;
     }
 
-    private function buildUrl()
+    public function getId()
     {
-        return $this->baseUrl . '/api/index/'. $this->index;
+        return $this->id;
     }
 
-    public function loadDef()
+    private function buildUrl()
     {
-        $response = new Browser()->get($this->buildUrl());
+        return $this->baseUrl . '/api/index/'. $this->id;
+    }
+
+    public function getDef()
+    {
+        static $data;
+
+        if (is_null($data)) {
+            $browser = new Browser();
+            $response = $browser->get($this->buildUrl());
+            $data = json_decode($response->getContent());
+        }
+
+        return $data;
+    }
+
+    public function getDocument($id)
+    {
+        return Document::load($this, $id);
     }
 }
