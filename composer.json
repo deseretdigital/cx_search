@@ -1,0 +1,21 @@
+{
+    "name": "codecraft/cx-search",
+    "description": "cXense search PHP library",
+    "keywords": ["cxense", "search"],
+    "homepage": "http://cxense.com",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Pedro Faria",
+            "email": "pedro@codecraft63.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "kriswallsmith/buzz": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Cxsearch": "src" }
+    }
+}
