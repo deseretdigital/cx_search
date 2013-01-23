@@ -50,4 +50,9 @@ class Index {
     {
         return Document::load($this, $id);
     }
+
+    public function newDocument($id)
+    {
+        return Document::create($this, $id);
+    }
 }

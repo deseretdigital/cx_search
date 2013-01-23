@@ -45,4 +45,16 @@ class IndexTest extends \PHPUnit_Framework_TestCase
         $doc = $index->getDocument('2007_SUBY_WRX_STI');
         $this->assertInstanceOf('Cxsearch\Document', $doc);
     }
+
+    /**
+     * @covers Cxsearch\Index::newDocument
+     */
+    public function testNewDocument()
+    {
+        $index = new Index('birt');
+        $index->setBaseUrl('http://sandbox.cxsearch.cxense.com');
+        $doc = $index->newDocument('2013_SUBY_WRX_STISSSS');
+        $this->assertInstanceOf('Cxsearch\Document', $doc);
+        $this->assertTrue($doc->isNew());
+    }
 }
