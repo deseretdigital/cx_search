@@ -2,7 +2,6 @@
 
 namespace Cxsearch;
 
-use Cxsearch\Document;
 use Buzz\Browser;
 
 class Index {
@@ -14,6 +13,11 @@ class Index {
         $this->id = $id;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function setBaseUrl($url)
     {
         $this->baseUrl = $url;
@@ -22,11 +26,6 @@ class Index {
     public function getBaseUrl()
     {
         return $this->baseUrl;
-    }
-
-    public function getId()
-    {
-        return $this->id;
     }
 
     private function buildUrl()

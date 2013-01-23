@@ -7,7 +7,7 @@ $birt->setBaseUrl('http://sandbox.cxsearch.cxense.com');
 
 $ret = $birt->getDef();
 
-//var_dump($ret);
+var_dump($ret);
 
 $doc1 = $birt->getDocument('2007_SUBY_WRX_STI');
 $doc1->quantity = 41;

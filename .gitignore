@@ -1,2 +1,5 @@
+vendor
+composer.phar
+phpunit.xml
 composer.lock
-vendor/
+.DS_Store
