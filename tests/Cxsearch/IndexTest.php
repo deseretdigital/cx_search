@@ -5,6 +5,7 @@ namespace Cxsearch;
 class IndexTest extends \PHPUnit_Framework_TestCase
 {
     /**
+    * @covers Cxsearch\Index::__construct
      * @covers Cxsearch\Index::getId
      */
     public function testGetId()
@@ -19,13 +20,15 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetBaseUrl()
     {
+        $baseUrl = 'http://sandbox.cxsearch.cxense.com';
         $index = new Index('birt');
-        $index->setBaseUrl('http://sandbox.cxsearch.cxense.com');
-        $this->assertEquals('http://sandbox.cxsearch.cxense.com', $index->getBaseUrl());
+        $index->setBaseUrl($baseUrl);
+        $this->assertEquals($baseUrl, $index->getBaseUrl());
     }
 
     /**
      * @covers Cxsearch\Index::getDef
+     * @covers Cxsearch\Index::buildUrl
      */
     public function testGetDef()
     {
