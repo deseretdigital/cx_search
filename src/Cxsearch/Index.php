@@ -55,4 +55,9 @@ class Index {
     {
         return Document::create($this, $id);
     }
+
+    public function newSearch()
+    {
+        return new Search($this);
+    }
 }

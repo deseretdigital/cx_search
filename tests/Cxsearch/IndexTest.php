@@ -5,7 +5,7 @@ namespace Cxsearch;
 class IndexTest extends \PHPUnit_Framework_TestCase
 {
     /**
-    * @covers Cxsearch\Index::__construct
+     * @covers Cxsearch\Index::__construct
      * @covers Cxsearch\Index::getId
      */
     public function testGetId()

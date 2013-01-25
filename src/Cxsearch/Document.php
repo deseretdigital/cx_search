@@ -4,7 +4,8 @@ namespace Cxsearch;
 
 use Buzz\Browser;
 
-class Document {
+class Document
+{
     private $_index;
     private $_baseUrl;
 
