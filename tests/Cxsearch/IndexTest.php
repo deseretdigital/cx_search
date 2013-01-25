@@ -4,14 +4,20 @@ namespace Cxsearch;
 
 class IndexTest extends \PHPUnit_Framework_TestCase
 {
+
+    protected function setUp()
+    {
+        $this->baseUrl = 'http://sandbox.cxsearch.cxense.com';
+        $this->index = new Index('birt');
+        $this->index->setBaseUrl($this->baseUrl);
+    }
     /**
      * @covers Cxsearch\Index::__construct
      * @covers Cxsearch\Index::getId
      */
     public function testGetId()
     {
-        $index = new Index('birt');
-        $this->assertEquals('birt', $index->getId());
+        $this->assertEquals('birt', $this->index->getId());
     }
 
     /**
@@ -20,10 +26,7 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetBaseUrl()
     {
-        $baseUrl = 'http://sandbox.cxsearch.cxense.com';
-        $index = new Index('birt');
-        $index->setBaseUrl($baseUrl);
-        $this->assertEquals($baseUrl, $index->getBaseUrl());
+        $this->assertEquals($this->baseUrl, $this->index->getBaseUrl());
     }
 
     /**
@@ -32,9 +35,7 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDef()
     {
-        $index = new Index('birt');
-        $index->setBaseUrl('http://sandbox.cxsearch.cxense.com');
-        $def = $index->getDef();
+        $def = $this->index->getDef();
         $this->assertObjectHasAttribute('configuration', $def);
     }
 
@@ -43,9 +44,7 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDocument()
     {
-        $index = new Index('birt');
-        $index->setBaseUrl('http://sandbox.cxsearch.cxense.com');
-        $doc = $index->getDocument('2007_SUBY_WRX_STI');
+        $doc = $this->index->getDocument('2007_SUBY_WRX_STI');
         $this->assertInstanceOf('Cxsearch\Document', $doc);
     }
 
@@ -54,10 +53,17 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     public function testNewDocument()
     {
-        $index = new Index('birt');
-        $index->setBaseUrl('http://sandbox.cxsearch.cxense.com');
-        $doc = $index->newDocument('2013_SUBY_WRX_STISSSS');
+        $doc = $this->index->newDocument('2013_SUBY_WRX_STISSSS');
         $this->assertInstanceOf('Cxsearch\Document', $doc);
         $this->assertTrue($doc->isNew());
+    }
+
+    /**
+     * @covers Cxsearch\Index::newSearch
+     */
+    public function testNewSearh()
+    {
+        $search = $this->index->newSearch();
+        $this->assertInstanceOf('Cxsearch\Search', $search);
     }
 }
