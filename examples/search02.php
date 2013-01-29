@@ -14,4 +14,7 @@ $birt->newSearch()
     ->sort(array('msrp' => 'asc'))
     ->run($result);
 
- var_dump($result);
+var_dump($result->length());
+foreach ($result as $match) {
+    var_dump($match->doc->id);
+}

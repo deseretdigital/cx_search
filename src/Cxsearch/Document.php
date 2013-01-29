@@ -31,6 +31,12 @@ class Document
         return $obj;
     }
 
+    public static function materialize(Index $index, $data)
+    {
+        $obj = new Document($index, $data);
+        return $obj;
+    }
+
     private function __construct(Index $index, $data=null)
     {
         $this->_index = $index;

@@ -2,6 +2,7 @@
 
 namespace Cxsearch;
 
+use Cxsearch\Search\Result;
 use Buzz\Browser;
 
 class Search
@@ -219,9 +220,10 @@ class Search
 
         if ($response->getStatusCode() != 200) {
             $result = $response->getContent();
-            return;
+            return FALSE;
         }
 
-        $result = json_decode($response->getContent());
+        $data = json_decode($response->getContent());
+        $result = new Result($this->_index, $data);
     }
 }
