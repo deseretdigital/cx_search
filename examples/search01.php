@@ -12,5 +12,7 @@ $birt->newSearch()
 	->filterByFoo('aaa')
 	->orQueryByTitle('aeee')
 	->orQueryByBody('Weeeee', 4)
+    ->prefixSuffix('description', 'PRE', 'SUF')
+    ->sort(array(array('title' => 'asc'), array('year' => 'desc')))
 	//->orQuery()
 	->dump();

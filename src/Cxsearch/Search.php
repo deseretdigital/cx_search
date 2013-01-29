@@ -21,6 +21,61 @@ class Search
         $this->_qry[$key] = $data;
     }
 
+    // Normal Search
+
+    public function lang($lang)
+    {
+        $this->_addQuery('p_lang', $lang);
+        return $this;
+    }
+
+    public function sort($sort)
+    {
+        /*
+        $final = array();
+        foreach ($sort as $key => $value) {
+            $final[] = $key .':'. $value;
+        }
+        $final = '[{'. join($final, '},{') . '}]';
+        */
+        $this->_addQuery('p_sm', json_encode($sort));
+        return $this;
+    }
+
+    public function start($start)
+    {
+        $this->_addQuery('p_s', $start);
+        return $this;
+    }
+
+    public function limit($limit)
+    {
+        $this->_addQuery('p_c', $limit);
+        return $this;
+    }
+
+    public function duplicateRemoval($fields)
+    {
+        $this->_addQuery('p_dr', $fields);
+        return $this;
+    }
+
+    public function prefixSuffix($target, $prefix, $suffix)
+    {
+        $rs = array(
+            'hl' => array(
+                $target => array(
+                    'p' => $prefix,
+                    's' => $suffix
+                )
+            )
+        );
+        $this->_addQuery('p_rs', json_encode($rs));
+        return $this;
+    }
+
+    // Advanced Search
+
     private function _prefix($cmd, $prefix=null)
     {
         $prefix = is_null($prefix) ? 'AND' : $prefix;
@@ -78,6 +133,8 @@ class Search
         $this->_filter($target, $op, $value, 'OR');
         return $this;
     }
+
+    // Auto Queries/Fields
 
     private function _callQuery($params, $args)
     {
@@ -152,13 +209,19 @@ class Search
         print $query . "\n";
     }
 
-    public function run($result)
+    public function run(&$result)
     {
         $query = $this->_buildQuery();
 
         $browser = new Browser();
 
         $response = $browser->get($this->_index->getBaseUrl() . '/api/search/' . $this->_index->getId() . '/' . $query);
+
+        if ($response->getStatusCode() != 200) {
+            $result = $response->getContent();
+            return;
+        }
+
         $result = json_decode($response->getContent());
     }
 }
