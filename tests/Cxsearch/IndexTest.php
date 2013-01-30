@@ -2,6 +2,8 @@
 
 namespace Cxsearch;
 
+use Buzz\Browser;
+
 class IndexTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -11,9 +13,11 @@ class IndexTest extends \PHPUnit_Framework_TestCase
         $this->index = new Index('birt');
         $this->index->setBaseUrl($this->baseUrl);
     }
+
     /**
      * @covers Cxsearch\Index::__construct
      * @covers Cxsearch\Index::getId
+     * @covers Cxsearch\Index::setBrowser
      */
     public function testGetId()
     {
@@ -30,13 +34,30 @@ class IndexTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Cxsearch\Index::__construct
+     */
+    public function testNewIndexWithCustomBrowser()
+    {
+        $index = new Index('birt', new Browser);
+    }
+
+    /**
      * @covers Cxsearch\Index::getDef
      * @covers Cxsearch\Index::buildUrl
      */
     public function testGetDef()
     {
-        $def = $this->index->getDef();
+        $def = $this->index->getDef(TRUE);
         $this->assertObjectHasAttribute('configuration', $def);
+    }
+
+    /**
+     * @covers Cxsearch\Index::getBrowser
+     */
+    public function testGetBrowser()
+    {
+        $browser = $this->index->getBrowser();
+        $this->assertInstanceOf('Buzz\Browser', $browser);
     }
 
     /**

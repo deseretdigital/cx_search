@@ -2,8 +2,6 @@
 
 namespace Cxsearch;
 
-use Buzz\Browser;
-
 class Document
 {
     private $_index;
@@ -11,13 +9,14 @@ class Document
     private $_raw_data;
 
     private $_is_new = FALSE;
+    private $_is_changed = FALSE;
 
     private $_data;
     private $_new_data;
 
     public static function load(Index $index, $id)
     {
-        $browser = new Browser();
+        $browser = $index->getBrowser();
         $response = $browser->get($index->getBaseUrl() . '/api/content/' . $index->getId() . '/' . $id);
         $doc = json_decode($response->getContent());
 
@@ -42,7 +41,6 @@ class Document
     {
         $this->_index = $index;
         $this->_baseUrl = $index->getBaseUrl();
-        $this->_raw_data = $data;
         $this->_new_data = new \stdClass;
 
         if (is_null($data)) {
@@ -93,6 +91,10 @@ class Document
         }
 
         $this->_new_data->fields->{$name} = $value;
+
+        if (!$this->_is_changed && !is_null($value)) {
+            $this->_is_changed = TRUE;
+        }
     }
 
     public function __get($name)
@@ -124,28 +126,52 @@ class Document
         return $this->_data;
     }
 
+    private function _saved()
+    {
+        $newDoc = self::load($this->_index, $this->id);
+
+        $this->_data = $newDoc->getData();
+        unset($newDoc);
+
+        $this->_is_new = FALSE;
+        $this->_is_changed = FALSE;
+        //$this->_data->id = $this->_new_data->id;
+        $this->_new_data = new \stdClass;
+    }
+
     public function save()
     {
         // Nothing to do!
-        if (is_null($this->_new_data)) {
+        if (!$this->_is_changed) {
             return;
         }
 
-        $browser = new Browser();
+        $browser = $this->_index->getBrowser();
         $url = $this->buildUrl() . "/" . $this->id;
 
         if ($this->_is_new) {
-            $data = json_encode($this->_new_data->fields);
+            $data = json_encode(array('fields' => $this->_new_data->fields));
             $response = $browser->post($url, array(), $data);
-            return $response->isSuccessful();
+            
+            if ($response->isSuccessful()) {
+                $this->_saved();
+                return TRUE;
+            }
+
+            return FALSE;
         }
 
         $data = (object) array_merge((array) $this->_data->fields, (array) $this->_new_data->fields);
-
-        $this->delete();
+        $data = json_encode(array('fields' => $data));
 
         $response = $browser->post($url, array(), $data);
-        return $response->isSuccessful();
+        
+        if ($response->isSuccessful()) {
+            $this->_saved();
+            return TRUE;
+        }
+
+        return FALSE;
     }
 
     public function delete()
@@ -155,7 +181,7 @@ class Document
             return;
         }
 
-        $browser = new Browser();
+        $browser = $this->_index->getBrowser();
         $url = $this->buildUrl() . "/" . $this->id;
         $response = $browser->delete($url);
 

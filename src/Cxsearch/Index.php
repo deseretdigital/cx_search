@@ -7,10 +7,16 @@ use Buzz\Browser;
 class Index {
     private $baseUrl;
     private $id;
+    private $browser;
 
-    public function __construct($id)
+    public function __construct($id, $browser = null)
     {
         $this->id = $id;
+        if (is_null($browser)) {
+            $this->setBrowser(new Browser());
+        } else {
+            $this->setBrowser($browser);
+        }
     }
 
     public function getId()
@@ -28,18 +34,27 @@ class Index {
         return $this->baseUrl;
     }
 
+    public function getBrowser()
+    {
+        return $this->browser;
+    }
+
+    public function setBrowser($browser)
+    {
+        $this->browser = $browser;
+    }
+
     private function buildUrl()
     {
         return $this->baseUrl . '/api/index/'. $this->id;
     }
 
-    public function getDef()
+    public function getDef($reset=FALSE)
     {
         static $data;
 
-        if (is_null($data)) {
-            $browser = new Browser();
-            $response = $browser->get($this->buildUrl());
+        if (is_null($data) || $reset) {
+            $response = $this->browser->get($this->buildUrl());
             $data = json_decode($response->getContent());
         }
 

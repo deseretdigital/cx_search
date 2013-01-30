@@ -3,7 +3,6 @@
 namespace Cxsearch;
 
 use Cxsearch\Search\Result;
-use Buzz\Browser;
 
 class Search
 {
@@ -215,7 +214,7 @@ class Search
     {
         $query = $this->_buildQuery();
 
-        $browser = new Browser();
+        $browser = $this->_index->getBrowser();
 
         $response = $browser->get($this->_index->getBaseUrl() . '/api/search/' . $this->_index->getId() . '/' . $query);
 
