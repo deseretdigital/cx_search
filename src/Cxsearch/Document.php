@@ -8,6 +8,7 @@ class Document
 {
     private $_index;
     private $_baseUrl;
+    private $_raw_data;
 
     private $_is_new = FALSE;
 
@@ -41,6 +42,7 @@ class Document
     {
         $this->_index = $index;
         $this->_baseUrl = $index->getBaseUrl();
+        $this->_raw_data = $data;
         $this->_new_data = new \stdClass;
 
         if (is_null($data)) {
