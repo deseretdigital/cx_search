@@ -122,7 +122,8 @@ class Document
         return $this->_data;
     }
 
-    public function save() {
+    public function save()
+    {
         // Nothing to do!
         if (is_null($this->_new_data)) {
             return;

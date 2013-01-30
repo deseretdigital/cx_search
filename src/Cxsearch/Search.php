@@ -18,7 +18,8 @@ class Search
         return $this;
     }
 
-    private function _addQuery($key, $data) {
+    private function _addQuery($key, $data)
+    {
         $this->_qry[$key] = $data;
     }
 
