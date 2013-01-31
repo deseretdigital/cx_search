@@ -32,13 +32,6 @@ class Search
 
     public function sort($sort)
     {
-        /*
-        $final = array();
-        foreach ($sort as $key => $value) {
-            $final[] = $key .':'. $value;
-        }
-        $final = '[{'. join($final, '},{') . '}]';
-        */
         $this->_addQuery('p_sm', json_encode($sort));
         return $this;
     }
