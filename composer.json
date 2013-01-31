@@ -2,16 +2,20 @@
     "name": "codecraft/cx-search",
     "description": "cXense search PHP library",
     "keywords": ["cxense", "search"],
-    "homepage": "https://github.com/codecraft63/cx_search",
+    "homepage": "http://cxense.com",
     "license": "MIT",
     "type": "library",
     "authors": [
         {
-            "name": "Pedro Faria",
+            "name": "Pedro Faria de Miranda Pinto",
             "email": "pedro@codecraft63.com"
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "kriswallsmith/buzz": ">=v0.7"
+    },
+    "autoload": {
+        "psr-0": { "Cxsearch": "src" }
     }
 }
