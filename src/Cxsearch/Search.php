@@ -204,10 +204,9 @@ class Search
         return '?' . join($final, '&');
     }
 
-    public function dump()
+    public function dump(&$result)
     {
-        $query = $this->_buildQuery(FALSE);
-        print $query . "\n";
+        $result = $this->_buildQuery(FALSE);
     }
 
     public function run(&$result)
