@@ -2,7 +2,7 @@
 
 require dirname(__file__).'/../vendor/autoload.php';
 
-$birt = new Cxsearch\Index('birt');
+$birt = new Cxsearch\Index('_all');
 $birt->setBaseUrl('http://sandbox.cxsearch.cxense.com');
 
 $result = null;
@@ -17,4 +17,5 @@ $birt->newSearch()
 var_dump($result->length());
 foreach ($result as $match) {
     var_dump($match->doc->id);
+    var_dump($match->getIndex()->getId());
 }
