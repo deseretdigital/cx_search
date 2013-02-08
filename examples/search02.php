@@ -2,8 +2,8 @@
 
 require dirname(__file__).'/../vendor/autoload.php';
 
-$birt = new Cxsearch\Index('_all');
-$birt->setBaseUrl('http://sandbox.cxsearch.cxense.com');
+$conf = new Cxsearch\Configuration;
+$birt = new Cxsearch\Index($conf, '_all');
 
 $result = null;
 $birt->newSearch()

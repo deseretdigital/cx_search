@@ -197,9 +197,16 @@ class Search
         return '?' . join($final, '&');
     }
 
-    public function dump(&$result)
+    public function dump(&$result=FALSE)
     {
-        $result = $this->_buildQuery(FALSE);
+        $query = $this->_buildQuery(FALSE);
+        
+        if ($result === FALSE) {
+            var_dump($query);
+            return;
+        }
+
+        $result = $query;
     }
 
     public function run(&$result)

@@ -12,8 +12,8 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->baseUrl = 'http://sandbox.cxsearch.cxense.com';
-        $this->index = new Index('birt');
-        $this->index->setBaseUrl($this->baseUrl);
+        $conf = new Configuration;
+        $this->index = new Index($conf, 'birt');
     }
 
     /**

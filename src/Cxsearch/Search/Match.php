@@ -24,8 +24,7 @@ class Match
         $this->match = $match;
 
         if ($index->getId() != $match->index) {
-            $this->index = new Index($match->index);
-            $this->index->setBaseUrl($index->getBaseUrl());
+            $this->index = new Index($index->getConfiguration(), $match->index);
         }
         
         $this->doc = Document::materialize($this->index, $match->document);
