@@ -1,9 +1,11 @@
 <?php
 
-require dirname(__file__).'/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
-$birt = new Cxsearch\Index('birt');
-$birt->setBaseUrl('http://sandbox.cxsearch.cxense.com');
+$conf = new Cxsearch\Configuration;
+$birt = new Cxsearch\Index($conf);
+
+$birt->setIndex('birt');
 
 $doc1 = $birt->getDocument('2007_SUBY_WRX_STI');
 

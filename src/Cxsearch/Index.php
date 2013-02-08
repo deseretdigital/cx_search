@@ -4,19 +4,24 @@ namespace Cxsearch;
 
 use Buzz\Browser;
 
-class Index {
-    private $baseUrl;
+class Index
+{
+    private $config;
     private $id;
     private $browser;
 
-    public function __construct($id, $browser = null)
+    public function __construct(Configuration $config, $id=NULL)
+    {
+        $this->config = $config;
+
+        if (!is_null($id)) {
+            $this->setIndex($id);
+        }
+    }
+
+    public function setIndex($id)
     {
         $this->id = $id;
-        if (is_null($browser)) {
-            $this->setBrowser(new Browser());
-        } else {
-            $this->setBrowser($browser);
-        }
     }
 
     public function getId()
@@ -24,29 +29,29 @@ class Index {
         return $this->id;
     }
 
-    public function setBaseUrl($url)
+    public function getConfiguration()
     {
-        $this->baseUrl = $url;
+        return $this->config;
     }
 
     public function getBaseUrl()
     {
-        return $this->baseUrl;
+        return $this->config->api_url;
     }
 
     public function getBrowser()
     {
-        return $this->browser;
+        return $this->config->browser;
     }
 
-    public function setBrowser($browser)
+    public function setBrowser(Browser $browser)
     {
-        $this->browser = $browser;
+        $this->config->setBrowser($browser);
     }
 
     private function buildUrl()
     {
-        return $this->baseUrl . '/api/index/'. $this->id;
+        return $this->getBaseUrl() . '/api/index/'. $this->id;
     }
 
     public function getDef($reset=FALSE)
@@ -54,7 +59,8 @@ class Index {
         static $data;
 
         if (is_null($data) || $reset) {
-            $response = $this->browser->get($this->buildUrl());
+            $broser = $this->config->browser;
+            $response = $broser->get($this->buildUrl());
             $data = json_decode($response->getContent());
         }
 
