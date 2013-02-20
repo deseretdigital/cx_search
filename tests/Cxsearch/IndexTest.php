@@ -25,23 +25,27 @@ class IndexTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Cxsearch\Index::setBaseUrl
+     * @covers Cxsearch\Configuration::setBaseUrl
+     * @covers Cxsearch\Index::getConfiguration
      * @covers Cxsearch\Index::getBaseUrl
      */
     public function testSetBaseUrl()
     {
+        $this->index->getConfiguration()->setBaseUrl($this->baseUrl);
         $this->assertEquals($this->baseUrl, $this->index->getBaseUrl());
     }
 
     /**
-     * @covers Cxsearch\Index::__construct
+     * @covers Cxsearch\Configuration::__construct
+     * @covers Cxsearch\Index::setBrowser
+     * @covers Cxsearch\Index::setIndex
+     * @covers Cxsearch\Configuration::setBrowser
      */
     public function testNewIndexWithCustomBrowser()
     {
         $conf = new Configuration;
-        $conf->setBrowser(new Browser);
-        
         $index = new Index($conf);
+        $index->setBrowser(new Browser);
     }
 
     /**

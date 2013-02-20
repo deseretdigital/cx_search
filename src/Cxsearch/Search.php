@@ -13,7 +13,6 @@ class Search
     public function __construct($index)
     {
         $this->_index = $index;
-
         return $this;
     }
 
@@ -169,12 +168,9 @@ class Search
             $this->_callFilter($rs, $args);
         } else {
             $trace = debug_backtrace();
-            trigger_error(
-                'Undefined method via __call(): ' . $name .
+            throw new UnknownMethod('Undefined method via __call(): ' . $name .
                 ' in ' . $trace[0]['file'] .
-                ' on line ' . $trace[0]['line'],
-                E_USER_ERROR);
-            return;
+                ' on line ' . $trace[0]['line']);
         }
 
         return $this;
@@ -214,15 +210,18 @@ class Search
         $query = $this->_buildQuery();
 
         $browser = $this->_index->getBrowser();
+        $url = $this->_index->getBaseUrl() . '/api/search/' . $this->_index->getId() . '/' . $query;
 
-        $response = $browser->get($this->_index->getBaseUrl() . '/api/search/' . $this->_index->getId() . '/' . $query);
+        $response = $browser->get($url);
 
-        if ($response->getStatusCode() != 200) {
+        if (!$response->isSuccessful()) {
             $result = $response->getContent();
             return FALSE;
         }
-
+        
         $data = json_decode($response->getContent());
         $result = new Result($this->_index, $data);
     }
 }
+
+class UnknownMethod extends \Exception {}

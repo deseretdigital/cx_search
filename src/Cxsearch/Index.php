@@ -8,7 +8,6 @@ class Index
 {
     private $config;
     private $id;
-    private $browser;
 
     public function __construct(Configuration $config, $id=NULL)
     {
