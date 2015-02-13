@@ -3,6 +3,7 @@
 namespace Cxsearch;
 
 use Buzz\Browser;
+use Cxsearch\FacetGroup\FacetGroup;
 
 /**
  * @group Search
@@ -217,5 +218,13 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $index = $this->getCxIndex(TRUE, '_all');
         
         $index->newSearch()->query('ford')->run($foo);
+    }
+
+    public function testAddFacetGroup()
+    {
+        $facets = \Mockery::mock(new FacetGroup);
+        $actual = $facets->buildQuery();
+
+
     }
 }

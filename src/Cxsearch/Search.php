@@ -2,6 +2,7 @@
 
 namespace Cxsearch;
 
+use Cxsearch\FacetGroup\FacetGroup;
 use Cxsearch\Search\Result;
 
 class Search
@@ -50,6 +51,16 @@ class Search
     public function duplicateRemoval($fields)
     {
         $this->_addQuery('p_dr', $fields);
+        return $this;
+    }
+
+    public function addFacetGroup($fields)
+    {
+        $facetGroup = new FacetGroup();
+        foreach($fields as $fieldName=>$fieldParams) {
+            $facetGroup->newFacet($fieldName, $fieldParams);
+        }
+        $this->_addQuery('p_f', $facetGroup->buildQuery());
         return $this;
     }
 

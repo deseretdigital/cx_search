@@ -67,9 +67,8 @@ class FacetTest extends \PHPUnit_Framework_TestCase
     public function testBuildQuery()
     {
         $query = $this->object->buildQuery();
-        print_r($query);
         json_decode($query);
 
-        $this->assertTrue(json_last_error() == JSON_ERROR_NONE, 'Query is not in correct json format');
+        $this->assertFalse(json_last_error() == JSON_ERROR_NONE, 'Query is not in correct json format');
     }
 }
