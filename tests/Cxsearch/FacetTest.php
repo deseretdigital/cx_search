@@ -13,51 +13,22 @@ class FacetTest extends \PHPUnit_Framework_TestCase
         $this->object = new Facet();
     }
 
-    /**
-     */
-    public function testMinCount()
+    public function testSetData()
     {
-        $expected = 1;
-        $this->object->setMinCount( $expected );
-        $actual = $this->object->getMinCount();
-
-        $this->assertEquals($expected, $actual, 'Mincount is not set properly');
-    }
-
-    /**
-     */
-    public function testDepth()
-    {
-        $expected = 1;
-        $this->object->setDepth( $expected );
-        $actual = $this->object->getDepth();
-
-        $this->assertEquals($expected, $actual, 'Depth is not set properly');
-    }
-
-    /**
-     */
-    public function testRanges()
-    {
+        // arrange
         $expected = array(
-            'from'  => 0,
-            'to'    => 100,
-        );
-        $this->object->setRanges( $expected );
-        $actual = $this->object->getRanges();
+            'FieldName' => 'line',
+            'Depth'     => '200',
+            'MinCount'  => '1',
+            'MaxLabels' => '5',
+            'Ranges'    => array(0, 100)
+            );
+        // act
+        $this->object->setData($expected);
+        $actual = $this->object->toArray();
 
-        $this->assertEquals($expected, $actual, 'Ranges is not set properly');
-    }
-
-    /**
-     */
-    public function testMaxLabels()
-    {
-        $expected = 1;
-        $this->object->setMaxLabels( $expected );
-        $actual = $this->object->getMaxLabels();
-
-        $this->assertEquals($expected, $actual, 'Maxlabels is not set properly');
+        // assert
+        $this->assertEquals($expected, $actual, 'Data not set properly');
     }
 
     /**
@@ -66,9 +37,17 @@ class FacetTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildQuery()
     {
+        $expected = array(
+            'FieldName' => 'line',
+            'Depth'     => '200',
+            'MinCount'  => '1',
+            'MaxLabels' => '5',
+            'Ranges'    => array(0, 100)
+        );
+        $this->object->setData($expected);
+
         $query = $this->object->buildQuery();
         json_decode($query);
-
         $this->assertFalse(json_last_error() == JSON_ERROR_NONE, 'Query is not in correct json format');
     }
 }

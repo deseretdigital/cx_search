@@ -10,13 +10,62 @@ class Facet
     private $maxLabels;
     private $query;
 
-    public function __construct($fieldName, $fieldParams)
+   /* public function __construct($fieldName, $fieldParams)
     {
         $this->field = $fieldName;
         $this->setDepth($fieldParams['documentCount']);
         $this->setMinCount($fieldParams['count']);
         $this->setRanges($fieldParams['range']);
         $this->setMaxLabels($fieldParams['leastFrequency']);
+    }*/
+
+    /**
+     * General purpose set data that will map
+     * a data array to corresponding setter method
+     *
+     * Supported format for $data:
+     * <pre>
+     * array(
+     *     {property} => {value}
+     * )
+     * </pre>
+     *
+     * @param array $data [description]
+     * @return object
+     */
+    public function setData(array $data)
+    {
+        foreach($data as $key => $value) {
+            if(isset($key)){
+                $setter = 'set' . $key;
+                if(method_exists($this, $setter)) {
+                    $this->$setter($value);
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Converts model into Array
+     * @return array
+     */
+    public function toArray()
+    {
+        $properties = get_object_vars($this);
+        $data = array();
+        foreach($properties as $key => $value) {
+            $getter = 'get' . $key;
+            if(method_exists($this, $getter)){
+                $data[$key] = $this->$getter();
+            }
+        }
+        return $data;
+    }
+
+    public function setFieldName($fieldName)
+    {
+        $this->field = $fieldName;
     }
 
     public function setMinCount($minCount)
@@ -37,6 +86,12 @@ class Facet
     public function setMaxLabels($maxLabels)
     {
         $this->maxLabels = $maxLabels;
+    }
+
+
+    public function getFieldName()
+    {
+        return $this->field;
     }
 
     /*
@@ -103,20 +158,22 @@ class Facet
 
     private function ranges()
     {
-        $this->_addQuery('r', json_encode($this->getRanges()));
+        $this->_addQuery('r', $this->getRanges());
+        return $this;
+    }
+
+    private function fieldName()
+    {
+        $this->_addQuery('fieldName', $this->getFieldName());
         return $this;
     }
 
     private function buildJson()
     {
-        $json = array();
+        $fieldName = $this->query['fieldName'];
+        unset($this->query['fieldName']);
 
-        foreach( $this->query as $key=>$value ) {
-            $json[] = $key . ':' . $value;
-        }
-        $json = $this->field . json_encode( implode('', $json) );
-
-        return json_encode($json);
+        return json_encode(array($fieldName => $this->query));
     }
 
     /*
@@ -125,7 +182,8 @@ class Facet
      */
     public function buildQuery()
     {
-        return $this->depth()
+        return $this->fieldName()
+                    ->depth()
                     ->maxLabels()
                     ->minCount()
                     ->ranges()
