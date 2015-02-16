@@ -3,22 +3,17 @@ namespace Cxsearch\FacetGroup;
 
 class Facet
 {
-    private $field;
+    private $fieldName;
     private $minCount;
     private $depth;
     private $ranges;
     private $maxLabels;
     private $query;
 
-   /* public function __construct($fieldName, $fieldParams)
+    public function __construct($data)
     {
-        $this->field = $fieldName;
-        $this->setDepth($fieldParams['documentCount']);
-        $this->setMinCount($fieldParams['count']);
-        $this->setRanges($fieldParams['range']);
-        $this->setMaxLabels($fieldParams['leastFrequency']);
-    }*/
-
+        $this->setData($data);
+    }
     /**
      * General purpose set data that will map
      * a data array to corresponding setter method
@@ -65,7 +60,7 @@ class Facet
 
     public function setFieldName($fieldName)
     {
-        $this->field = $fieldName;
+        $this->fieldName = $fieldName;
     }
 
     public function setMinCount($minCount)
@@ -91,7 +86,7 @@ class Facet
 
     public function getFieldName()
     {
-        return $this->field;
+        return $this->fieldName;
     }
 
     /*
@@ -118,10 +113,7 @@ class Facet
      */
     public function getRanges()
     {
-        return array(
-            'from'  => $this->ranges[0],
-            'to'    => $this->ranges[1]
-        );
+        return $this->ranges;
     }
 
     /*
@@ -135,7 +127,9 @@ class Facet
 
     private function _addQuery($key, $value)
     {
-        $this->query[$key] = $value;
+        if ( !is_null($value) ) {
+            $this->query[$key] = $value;
+        }
     }
 
     private function depth()

@@ -222,9 +222,49 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
     public function testAddFacetGroup()
     {
-        $facets = \Mockery::mock(new FacetGroup);
-        $actual = $facets->buildQuery();
+        $search = new Search($this->index);
+        $search->query('Ford')
+               ->addFacetGroup(
+                    array(
+                        array(
+                            'fieldName' => 'line',
+                            'depth'     => '200',
+                            'minCount'  => '1',
+                            'maxLabels' => '5',
+                            'ranges'    => array(
+                                array(
+                                    'from'  => 0,
+                                    'to'    => 100
+                                ),
+                                array(
+                                    'from'  => 120,
+                                    'to'    => 140
+                                )
+                            )
+                        ),
+                        array(
+                            'fieldName' => 'msrp',
+                            'depth'     => '100',
+                            'minCount'  => '1',
+                            'maxLabels' => '10',
+                            'ranges'    => array(
+                                array(
+                                    'from'  => 0,
+                                    'to'    => 150
+                                ),
+                                array(
+                                    'from'  => 200,
+                                    'to'    => 250
+                                )
+                            )
+                        )
+                    )
+               );
+        $search->dump($result);
 
-
+        $this->assertEquals(
+            $result,
+            '?p_f={"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}&p_aq=query("Ford")'
+        );
     }
 }

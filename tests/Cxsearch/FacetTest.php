@@ -8,26 +8,27 @@ class FacetTest extends \PHPUnit_Framework_TestCase
 {
     protected $object;
 
-    protected function setUp()
-    {
-        $this->object = new Facet();
-    }
-
     public function testSetData()
     {
-        // arrange
         $expected = array(
-            'FieldName' => 'line',
-            'Depth'     => '200',
-            'MinCount'  => '1',
-            'MaxLabels' => '5',
-            'Ranges'    => array(0, 100)
+            'fieldName' => 'line',
+            'depth'     => '200',
+            'minCount'  => '1',
+            'maxLabels' => '5',
+            'ranges'    => array(
+                    array(
+                        'from'  => 0,
+                        'to'    => 100
+                    ),
+                    array(
+                        'from'  => 120,
+                        'to'    => 140
+                    )
+                )
             );
-        // act
-        $this->object->setData($expected);
+        $this->object = new Facet($expected);
         $actual = $this->object->toArray();
 
-        // assert
         $this->assertEquals($expected, $actual, 'Data not set properly');
     }
 
@@ -37,17 +38,27 @@ class FacetTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildQuery()
     {
-        $expected = array(
-            'FieldName' => 'line',
-            'Depth'     => '200',
-            'MinCount'  => '1',
-            'MaxLabels' => '5',
-            'Ranges'    => array(0, 100)
+        $expected = '{"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]}}';
+        $data = array(
+            'fieldName' => 'line',
+            'depth'     => '200',
+            'minCount'  => '1',
+            'maxLabels' => '5',
+            'ranges'    => array(
+                array(
+                    'from'  => 0,
+                    'to'    => 100
+                ),
+                array(
+                    'from'  => 120,
+                    'to'    => 140
+                )
+            )
         );
-        $this->object->setData($expected);
+        $this->object = new Facet($data);
 
-        $query = $this->object->buildQuery();
-        json_decode($query);
-        $this->assertFalse(json_last_error() == JSON_ERROR_NONE, 'Query is not in correct json format');
+        $this->assertJsonStringEqualsJsonString(
+            $expected, $this->object->buildQuery(), 'Query is not in expected json format'
+        );
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Cxsearch;
 
-use Cxsearch\FacetGroup\Facet;
 use Cxsearch\FacetGroup\FacetGroup;
 
 class FacetGroupTest extends \PHPUnit_Framework_TestCase
@@ -12,20 +11,39 @@ class FacetGroupTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->facetGroup = new FacetGroup();
-        $this->facetGroup->newFacet("line",
-            array(
-                'documentCount' => 200,
-                'count'         => 100,
-                'range'         => array(0, 100),
-                'leastFrequency'=> 1
+        $this->facetGroup->newFacet(array(
+                'fieldName' => 'line',
+                'depth'     => '200',
+                'minCount'  => '1',
+                'maxLabels' => '5',
+                'ranges'    => array(
+                    array(
+                        'from'  => 0,
+                        'to'    => 100
+                    ),
+                    array(
+                        'from'  => 120,
+                        'to'    => 140
+                    )
+                )
             )
         );
-        $this->facetGroup->newFacet("msrp",
+        $this->facetGroup->newFacet(
             array(
-                'documentCount' => 200,
-                'count'         => 100,
-                'range'         => array(100, 200),
-                'leastFrequency'=> 1
+                'fieldName' => 'msrp',
+                'depth'     => '100',
+                'minCount'  => '1',
+                'maxLabels' => '10',
+                'ranges'    => array(
+                    array(
+                        'from'  => 0,
+                        'to'    => 150
+                    ),
+                    array(
+                        'from'  => 200,
+                        'to'    => 250
+                    )
+                )
             )
         );
     }
@@ -39,11 +57,12 @@ class FacetGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildQuery()
     {
-        $query = $this->facetGroup->buildQuery();
-        json_decode($query);
-        echo json_decode($query);
+        $expected = '{"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},'
+                   .'"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}';
 
-        $this->assertFalse(json_last_error() == JSON_ERROR_NONE, 'Group query is not in correct json format');
+        $this->assertJsonStringEqualsJsonString(
+            $expected, $this->facetGroup->buildQuery(), 'Group query is not in correct json format'
+        );
 
     }
 }

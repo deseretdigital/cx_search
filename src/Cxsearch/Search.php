@@ -57,8 +57,8 @@ class Search
     public function addFacetGroup($fields)
     {
         $facetGroup = new FacetGroup();
-        foreach($fields as $fieldName=>$fieldParams) {
-            $facetGroup->newFacet($fieldName, $fieldParams);
+        foreach($fields as $field) {
+            $facetGroup->newFacet($field);
         }
         $this->_addQuery('p_f', $facetGroup->buildQuery());
         return $this;
@@ -229,7 +229,6 @@ class Search
             $result = $response->getContent();
             return FALSE;
         }
-        
         $data = json_decode($response->getContent());
         $result = new Result($this->_index, $data);
     }
