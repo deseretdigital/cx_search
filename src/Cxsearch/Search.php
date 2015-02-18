@@ -10,6 +10,7 @@ class Search
     private $_index;
     private $_qry = array();
     private $_a_qry = array();
+    private $_f_qry = "";
 
     public function __construct($index)
     {
@@ -54,13 +55,23 @@ class Search
         return $this;
     }
 
+    /**
+     * @param array | FacetGroup $fields
+     * @return $this
+     */
     public function addFacetGroup($fields)
     {
-        $facetGroup = new FacetGroup();
-        foreach($fields as $field) {
-            $facetGroup->newFacet($field);
+        if (is_array($fields)) {
+            $facetGroup = new FacetGroup();
+            foreach($fields as $field) {
+                $facetGroup->newFacet($field);
+            }
+        } else {
+            $facetGroup = $fields;
         }
-        $this->_addQuery('p_f', $facetGroup->buildQuery());
+
+        $this->_f_qry = $facetGroup;
+
         return $this;
     }
 
@@ -194,14 +205,20 @@ class Search
 
         $final = array();
 
-        foreach ($this->_qry as $key => $value) {
-            if ($encode) {
-                $value = urlencode($value);
-            }
-            $final[] = $key . '=' . $value;
+        if (!empty($this->_f_qry)) {
+            $facetQuery = $this->_f_qry->buildQuery();
+
+            die($facetQuery);
+            $final["p_f"] = $facetQuery;
         }
 
-        return '?' . join($final, '&');
+        foreach ($this->_qry as $key => $value) {
+            $final[$key] = $value;
+        }
+
+
+
+        return '?' . http_build_query($final);
     }
 
     public function dump(&$result=FALSE)

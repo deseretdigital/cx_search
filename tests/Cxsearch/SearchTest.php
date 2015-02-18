@@ -4,6 +4,7 @@ namespace Cxsearch;
 
 use Buzz\Browser;
 use Cxsearch\FacetGroup\FacetGroup;
+use Mockery\Mock;
 
 /**
  * @group Search
@@ -222,49 +223,25 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
     public function testAddFacetGroup()
     {
+        $facetQuery = '{"vendor":{"d":"all"},"scale":{"d":10},"line":{"d":100}}';
+        $expectedFacetQuery = 'p_f=' . $facetQuery . '&p_aq=query("Ford")';
         $search = new Search($this->index);
+
+        $facetGroupMock = \Mockery::mock('Cxsearch\FacetGroup\FacetGroup');
+        $facetGroupMock->shouldReceive("buildQuery")->andReturn($facetQuery);
+
         $search->query('Ford')
-               ->addFacetGroup(
-                    array(
-                        array(
-                            'fieldName' => 'line',
-                            'depth'     => '200',
-                            'minCount'  => '1',
-                            'maxLabels' => '5',
-                            'ranges'    => array(
-                                array(
-                                    'from'  => 0,
-                                    'to'    => 100
-                                ),
-                                array(
-                                    'from'  => 120,
-                                    'to'    => 140
-                                )
-                            )
-                        ),
-                        array(
-                            'fieldName' => 'msrp',
-                            'depth'     => '100',
-                            'minCount'  => '1',
-                            'maxLabels' => '10',
-                            'ranges'    => array(
-                                array(
-                                    'from'  => 0,
-                                    'to'    => 150
-                                ),
-                                array(
-                                    'from'  => 200,
-                                    'to'    => 250
-                                )
-                            )
-                        )
-                    )
-               );
+            ->addFacetGroup($facetGroupMock);
+
         $search->dump($result);
+
+        $result = urldecode($result);
 
         $this->assertEquals(
             $result,
-            '?p_f={"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}&p_aq=query("Ford")'
+            $expectedFacetQuery,
+            "Result and expecting strings does not match"
         );
+
     }
 }
