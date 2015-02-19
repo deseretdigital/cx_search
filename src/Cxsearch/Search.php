@@ -207,8 +207,6 @@ class Search
 
         if (!empty($this->_f_qry)) {
             $facetQuery = $this->_f_qry->buildQuery();
-
-            die($facetQuery);
             $final["p_f"] = $facetQuery;
         }
 
@@ -224,7 +222,7 @@ class Search
     public function dump(&$result=FALSE)
     {
         $query = $this->_buildQuery(FALSE);
-        
+
         if ($result === FALSE) {
             var_dump($query);
             return;

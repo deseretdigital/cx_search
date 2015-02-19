@@ -84,6 +84,9 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $search = new Search($this->index);
         $this->assertInstanceOf('Cxsearch\Search', $search);
 
+        $result = "";
+        $expectedString = '?p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}}&p_sm={"msrp":"asc"}&p_lang=en&p_s=1&p_c=4&p_dr=line&p_aq=query("Ford") OR query(scale^2:"1:21") AND query(line:"Classic Cars") AND filter(msrp>20) AND filter(vendor>"bubacar") OR filter(msrp<=40)';
+
         $search->query('Ford')
             ->orQuery('scale', '1:21', 2)
             ->andQueryByLine('Classic Cars')
@@ -97,10 +100,10 @@ class SearchTest extends \PHPUnit_Framework_TestCase
             ->limit(4)
             ->duplicateRemoval('line')
             ->dump($result);
-
-        $this->assertEquals($result, '?p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}}&p_sm={"msrp":"asc"}&p_lang=en&p_s=1&p_c=4&p_dr=line&p_aq=query("Ford") OR query(scale^2:"1:21") AND query(line:"Classic Cars") AND filter(msrp>20) AND filter(vendor>"bubacar") OR filter(msrp<=40)');
+        $result = urldecode($result);
+        $this->assertEquals($result, $expectedString);
     }
-    
+
     /**
      * @covers Cxsearch\Search::_buildQuery
      * @covers Cxsearch\Search::run
@@ -121,7 +124,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
         return $result;
     }
-    
+
     /**
      * @depends testRunSearch
      * @covers Cxsearch\Search\Result::getStart
@@ -144,7 +147,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($i, $result->length());
     }
-    
+
     /**
      * @depends testRunSearch
      * @covers Cxsearch\Search\Match::getIndex
@@ -158,7 +161,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Cxsearch\Index', $match->getIndex());
     }
-    
+
     /**
      * @covers Cxsearch\Search::run
      */
@@ -175,7 +178,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($rs);
     }
-    
+
    /**
     * @covers Cxsearch\Search::dump
     */
@@ -183,6 +186,8 @@ class SearchTest extends \PHPUnit_Framework_TestCase
    {
        $search = new Search($this->index);
        $this->assertInstanceOf('Cxsearch\Search', $search);
+
+       $expectedResult = 'string(376) "?p_rs=%7B%22hl%22%3A%7B%22description%22%3A%7B%22p%22%3A%22%3Cb%3E%22%2C%22s%22%3A%22%3C%5C%2Fb%3E%22%7D%7D%7D&p_sm=%7B%22msrp%22%3A%22asc%22%7D&p_lang=en&p_s=1&p_c=4&p_dr=line&p_aq=query%28%22Ford%22%29+OR+query%28scale%5E2%3A%221%3A21%22%29+AND+query%28line%3A%22Classic+Cars%22%29+AND+filter%28msrp%3E20%29+AND+filter%28vendor%3E%22bubacar%22%29+OR+filter%28msrp%3C%3D40%29"' + PHP_EOL;
 
        $search->query('Ford')
            ->orQuery('scale', '1:21', 2)
@@ -198,9 +203,9 @@ class SearchTest extends \PHPUnit_Framework_TestCase
            ->duplicateRemoval('line')
            ->dump();
 
-       $this->expectOutputString('string(248) "?p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}}&p_sm={"msrp":"asc"}&p_lang=en&p_s=1&p_c=4&p_dr=line&p_aq=query("Ford") OR query(scale^2:"1:21") AND query(line:"Classic Cars") AND filter(msrp>20) AND filter(vendor>"bubacar") OR filter(msrp<=40)"'. PHP_EOL);
+       $this->expectOutputString($expectedResult);
    }
-   
+
     /**
      * @covers Cxsearch\Search::__call
      * @expectedException Cxsearch\UnknownMethod
@@ -210,21 +215,21 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $search = new Search($this->index);
         $search->asdaASaddadsadsa('cry');
     }
-    
+
     /**
      * @covers Cxsearch\Search\Match::__construct
      */
     public function testSearchAllIndex()
     {
         $index = $this->getCxIndex(TRUE, '_all');
-        
+
         $index->newSearch()->query('ford')->run($foo);
     }
 
     public function testAddFacetGroup()
     {
         $facetQuery = '{"vendor":{"d":"all"},"scale":{"d":10},"line":{"d":100}}';
-        $expectedFacetQuery = 'p_f=' . $facetQuery . '&p_aq=query("Ford")';
+        $expectedFacetQuery = '?p_f=' . $facetQuery . '&p_aq=query("Ford")';
         $search = new Search($this->index);
 
         $facetGroupMock = \Mockery::mock('Cxsearch\FacetGroup\FacetGroup');
@@ -242,6 +247,60 @@ class SearchTest extends \PHPUnit_Framework_TestCase
             $expectedFacetQuery,
             "Result and expecting strings does not match"
         );
+    }
 
+    /*
+     * Test to assert Search::buildQuery joins FacetGroup::buildQuery as expected.
+     */
+    public function testAcceptSearchQuery()
+    {
+        $actualResult = "";
+        $expectedResult = '?p_f={"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}&p_aq=query("Ford")';
+
+        $search = new Search($this->index);
+        $search->query('Ford')
+            ->addFacetGroup(
+                array(
+                    array(
+                        'fieldName' => 'line',
+                        'depth' => '200',
+                        'minCount' => '1',
+                        'maxLabels' => '5',
+                        'ranges' => array(
+                            array(
+                                'from' => 0,
+                                'to' => 100
+                            ),
+                            array(
+                                'from' => 120,
+                                'to' => 140
+                            )
+                        )
+                    ),
+                    array(
+                        'fieldName' => 'msrp',
+                        'depth' => '100',
+                        'minCount' => '1',
+                        'maxLabels' => '10',
+                        'ranges' => array(
+                            array(
+                                'from' => 0,
+                                'to' => 150
+                            ),
+                            array(
+                                'from' => 200,
+                                'to' => 250
+                            )
+                        )
+                    )
+                )
+            );
+        $search->dump($actualResult);
+        $actualResult = urldecode($actualResult);
+
+        $this->assertEquals(
+            $actualResult,
+            $expectedResult
+        );
     }
 }
