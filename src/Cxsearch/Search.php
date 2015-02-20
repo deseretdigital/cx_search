@@ -203,20 +203,22 @@ class Search
         // Add Advanced Query
         $this->_addQuery('p_aq', join($this->_a_qry, ' '));
 
-        $final = array();
-
         if (!empty($this->_f_qry)) {
-            $facetQuery = $this->_f_qry->buildQuery();
-            $final["p_f"] = $facetQuery;
+            $this->_addQuery('p_f', $this->_f_qry->buildQuery());
         }
 
+        $final = array();
         foreach ($this->_qry as $key => $value) {
             $final[$key] = $value;
         }
 
+        $queryString = '?' . http_build_query($final);
 
+        if (!$encode) {
+            $queryString = urldecode($queryString);
+        }
 
-        return '?' . http_build_query($final);
+        return $queryString;
     }
 
     public function dump(&$result=FALSE)

@@ -14,38 +14,38 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->getDef_response = '{"documentCount":206,"operationCount":18,"name":"birt","configuration":{"index":{"number_of_replicas":0,"number_of_shards":1},"fields":{"scale":{"indexOps":"facet","type":"string"},"msrp":{"indexOps":"facet","type":"double"},"vendor":{"indexOps":"sort,facet","resultCfg":"hl","type":"string"},"line":{"indexOps":"facet,sort","type":"string"}}},"aliases":[]}';
-       
+
         $this->getContent_response = '{"matches":[{"index":"birt","document":{"fields":{"scale":"1:12","msrp":"136.67","vendor":"Welly Diecast Productions","description":"Model features 30 windows, skylights & glare resistant glass, working steering system, original logos","name":"1958 Setra Bus","line":"Trucks and Buses","seqnum":8},"id":"S12_1666","version":1},"score":1.0,"sortValues":[]},{"index":"birt","document":{"fields":{"scale":"1:18","msrp":"142.25","vendor":"Min Lin Diecast","description":"This model features, opening hood, opening doors, detailed engine, rear spoiler, opening trunk, working steering, tinted windows, baked enamel finish. Color yellow.","name":"1995 Honda Civic","line":"Classic Cars","seqnum":24},"id":"S18_1984","version":1},"score":1.0,"sortValues":[]},{"index":"birt","document":{"fields":{"scale":"1:18","msrp":"62.17","vendor":"Studio M Art Models","description":"Features rotating wheels , working kick stand. Comes with stand.","name":"1957 Vespa GS150","line":"Motorcycles","seqnum":44},"id":"S18_3782","version":1},"score":1.0,"sortValues":[]}],"start":0,"totalMatched":3,"annotations":{},"facets":{}}';
-        
+
         $this->baseUrl = 'http://sandbox.cxsearch.cxense.com';
-        
+
         $this->index = $this->getCxIndex();
     }
-    
+
     protected function getCxIndex($successful=TRUE, $id='birt')
     {
         $conf = new Configuration;
 		$conf->setBaseUrl($this->baseUrl);
-        
+
         $index = $this->getMock('Cxsearch\Index', array('getDef', 'getBrowser'), array($conf, $id));
         $index->expects($this->any())
             ->method('getDef')
                 ->will($this->returnValue(json_decode($this->getDef_response)));
-        
+
         $newResponse = $this->getMockBuilder('Buzz\Message\Response')
             ->disableOriginalConstructor()->getMock();
-        
+
         $newResponse->expects($this->any())
             ->method('isSuccessful')
             ->will($this->returnValue($successful));
-        
+
         $newResponse->expects($this->any())
             ->method('getContent')
             ->will($this->returnValue($this->getContent_response));
 
         $newBrowser = $this->getMockBuilder('Buzz\Browser')
             ->disableOriginalConstructor()->getMock();
- 
+
         $newBrowser->expects($this->any())
             ->method('get')
             ->will($this->returnValue($newResponse));
@@ -53,7 +53,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $index->expects($this->any())
             ->method('getBrowser')
             ->will($this->returnValue($newBrowser));
-        
+
         return $index;
     }
 
@@ -229,7 +229,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     public function testAddFacetGroup()
     {
         $facetQuery = '{"vendor":{"d":"all"},"scale":{"d":10},"line":{"d":100}}';
-        $expectedFacetQuery = '?p_f=' . $facetQuery . '&p_aq=query("Ford")';
+        $expectedFacetQuery = '?p_aq=query("Ford")&p_f=' . $facetQuery;
         $search = new Search($this->index);
 
         $facetGroupMock = \Mockery::mock('Cxsearch\FacetGroup\FacetGroup');
@@ -255,7 +255,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     public function testAcceptSearchQuery()
     {
         $actualResult = "";
-        $expectedResult = '?p_f={"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}&p_aq=query("Ford")';
+        $expectedResult = '?p_aq=query("Ford")&p_f={"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}';
 
         $search = new Search($this->index);
         $search->query('Ford')
