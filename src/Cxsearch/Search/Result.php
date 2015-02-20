@@ -5,7 +5,7 @@ namespace Cxsearch\Search;
 use Cxsearch\Document;
 
 /**
-* 
+*
 */
 class Result implements \Iterator
 {
@@ -22,7 +22,6 @@ class Result implements \Iterator
         $this->position     = 0;
         $this->index        = $index;
         $this->raw          = $resultset;
-        $this->raw->facets  = $resultset->facets;
         $this->start        = $resultset->start;
         $this->totalMatched = $resultset->totalMatched;
         foreach ($resultset->matches as $match) {
