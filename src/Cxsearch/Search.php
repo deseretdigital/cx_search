@@ -2,6 +2,7 @@
 
 namespace Cxsearch;
 
+use Cxsearch\FacetGroup\FacetGroup;
 use Cxsearch\Search\Result;
 
 class Search
@@ -9,6 +10,7 @@ class Search
     private $_index;
     private $_qry = array();
     private $_a_qry = array();
+    private $_f_qry = "";
 
     public function __construct($index)
     {
@@ -50,6 +52,26 @@ class Search
     public function duplicateRemoval($fields)
     {
         $this->_addQuery('p_dr', $fields);
+        return $this;
+    }
+
+    /**
+     * @param array | FacetGroup $fields
+     * @return $this
+     */
+    public function addFacetGroup($fields)
+    {
+        if (is_array($fields)) {
+            $facetGroup = new FacetGroup();
+            foreach($fields as $field) {
+                $facetGroup->newFacet($field);
+            }
+        } else {
+            $facetGroup = $fields;
+        }
+
+        $this->_f_qry = $facetGroup;
+
         return $this;
     }
 
@@ -181,22 +203,28 @@ class Search
         // Add Advanced Query
         $this->_addQuery('p_aq', join($this->_a_qry, ' '));
 
-        $final = array();
-
-        foreach ($this->_qry as $key => $value) {
-            if ($encode) {
-                $value = urlencode($value);
-            }
-            $final[] = $key . '=' . $value;
+        if (!empty($this->_f_qry)) {
+            $this->_addQuery('p_f', $this->_f_qry->buildQuery());
         }
 
-        return '?' . join($final, '&');
+        $final = array();
+        foreach ($this->_qry as $key => $value) {
+            $final[$key] = $value;
+        }
+
+        $queryString = '?' . http_build_query($final);
+
+        if (!$encode) {
+            $queryString = urldecode($queryString);
+        }
+
+        return $queryString;
     }
 
     public function dump(&$result=FALSE)
     {
         $query = $this->_buildQuery(FALSE);
-        
+
         if ($result === FALSE) {
             var_dump($query);
             return;
@@ -218,7 +246,6 @@ class Search
             $result = $response->getContent();
             return FALSE;
         }
-        
         $data = json_decode($response->getContent());
         $result = new Result($this->_index, $data);
     }

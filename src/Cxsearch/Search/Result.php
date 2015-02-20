@@ -5,7 +5,7 @@ namespace Cxsearch\Search;
 use Cxsearch\Document;
 
 /**
-* 
+*
 */
 class Result implements \Iterator
 {
@@ -24,7 +24,6 @@ class Result implements \Iterator
         $this->raw          = $resultset;
         $this->start        = $resultset->start;
         $this->totalMatched = $resultset->totalMatched;
-
         foreach ($resultset->matches as $match) {
             $this->matches[] = new Match($this->index, $match);
         }
@@ -58,5 +57,10 @@ class Result implements \Iterator
 
     public function valid() {
         return isset($this->matches[$this->position]);
+    }
+
+    public function getFacets()
+    {
+        return $this->raw->facets;
     }
 }
