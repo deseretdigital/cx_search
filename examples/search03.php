@@ -28,3 +28,5 @@ $birt->newSearch()
     ->prefixSuffix('description', '<b>', '</b>')
     ->sort(array('msrp' => 'asc'))
     ->run($result);
+
+var_dump($result->getFacets());
