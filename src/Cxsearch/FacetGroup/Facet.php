@@ -3,12 +3,11 @@ namespace Cxsearch\FacetGroup;
 
 class Facet
 {
-    private $fieldName;
-    private $minCount;
-    private $depth;
-    private $ranges;
-    private $maxLabels;
-    private $query;
+    protected $fieldName;
+    protected $minCount;
+    protected $depth;
+    protected $ranges;
+    protected $maxLabels;
 
     public function __construct($data)
     {
@@ -30,10 +29,10 @@ class Facet
      */
     public function setData(array $data)
     {
-        foreach($data as $key => $value) {
-            if(isset($key)){
+        foreach ($data as $key => $value) {
+            if (is_string($key)) {
                 $setter = 'set' . $key;
-                if(method_exists($this, $setter)) {
+                if (method_exists($this, $setter)) {
                     $this->$setter($value);
                 }
             }
@@ -49,9 +48,9 @@ class Facet
     {
         $properties = get_object_vars($this);
         $data = array();
-        foreach($properties as $key => $value) {
+        foreach ($properties as $key => $value) {
             $getter = 'get' . $key;
-            if(method_exists($this, $getter)){
+            if (method_exists($this, $getter)) {
                 $data[$key] = $this->$getter();
             }
         }
@@ -132,55 +131,20 @@ class Facet
         }
     }
 
-    private function depth()
-    {
-        $this->_addQuery('d', $this->getDepth());
-        return $this;
-    }
-
-    private function maxLabels()
-    {
-        $this->_addQuery('c', $this->getMaxLabels());
-        return $this;
-    }
-
-    private function minCount()
-    {
-        $this->_addQuery('lf', $this->getMinCount());
-        return $this;
-    }
-
-    private function ranges()
-    {
-        $this->_addQuery('r', $this->getRanges());
-        return $this;
-    }
-
-    private function fieldName()
-    {
-        $this->_addQuery('fieldName', $this->getFieldName());
-        return $this;
-    }
-
-    private function buildJson()
-    {
-        $fieldName = $this->query['fieldName'];
-        unset($this->query['fieldName']);
-
-        return json_encode(array($fieldName => $this->query));
-    }
-
     /*
      * Build query for search
      * @return string
      */
     public function buildQuery()
     {
-        return $this->fieldName()
-                    ->depth()
-                    ->maxLabels()
-                    ->minCount()
-                    ->ranges()
-                    ->buildJson();
+        $fieldName = $this->getFieldName();
+
+        $query = array();
+        $query['d'] = $this->getDepth();
+        $query['c'] = $this->getMaxLabels();
+        $query['lf'] = $this->getMinCount();
+        $query['r'] = $this->getRanges();
+
+        return json_encode(array($fieldName => $query));
     }
 }
