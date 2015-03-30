@@ -4,7 +4,6 @@ namespace Cxsearch;
 
 use Buzz\Browser;
 use Cxsearch\FacetGroup\FacetGroup;
-use Mockery\Mock;
 
 /**
  * @group Search
@@ -232,8 +231,10 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $expectedFacetQuery = '?p_aq=query("Ford")&p_f=' . $facetQuery;
         $search = new Search($this->index);
 
-        $facetGroupMock = \Mockery::mock('Cxsearch\FacetGroup\FacetGroup');
-        $facetGroupMock->shouldReceive("buildQuery")->andReturn($facetQuery);
+        $facetGroupMock = $this->getMock('Cxsearch\FacetGroup\FacetGroup');
+        $facetGroupMock->expects($this->any())
+                       ->method("buildQuery")
+                       ->will($this->returnValue($facetQuery));
 
         $search->query('Ford')
             ->addFacetGroup($facetGroupMock);
