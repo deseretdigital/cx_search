@@ -4,10 +4,10 @@ namespace Cxsearch\FacetGroup;
 class Facet
 {
     protected $fieldName;
-    protected $minCount;
-    protected $depth;
-    protected $ranges;
-    protected $maxLabels;
+    protected $minCount = 1;
+    protected $depth = 'all';
+    protected $ranges = null;
+    protected $maxLabels = 100;
 
     public function __construct($data)
     {
@@ -143,7 +143,11 @@ class Facet
         $query['d'] = $this->getDepth();
         $query['c'] = $this->getMaxLabels();
         $query['lf'] = $this->getMinCount();
-        $query['r'] = $this->getRanges();
+
+        $ranges = $this->getRanges();
+        if (!empty($ranges)) {
+            $query['r'] = $ranges;
+        }
 
         return json_encode(array($fieldName => $query));
     }
