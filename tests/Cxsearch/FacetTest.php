@@ -61,4 +61,22 @@ class FacetTest extends \PHPUnit_Framework_TestCase
             $expected, $this->object->buildQuery(), 'Query is not in expected json format'
         );
     }
+
+
+    public function testFacetDefaults()
+    {
+        // arrange
+        $data = array(
+            'fieldName' => 'star_rating'
+        );
+        $expected = '{"star_rating":{"d":"all","c":100,"lf":1}}';
+
+        // act
+        $this->object = new Facet($data);
+
+        // assert
+        $this->assertJsonStringEqualsJsonString(
+            $expected, $this->object->buildQuery(), 'Query is not in expected json format'
+        );
+    }
 }
