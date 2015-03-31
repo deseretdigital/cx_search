@@ -57,8 +57,8 @@ class FacetGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildQuery()
     {
-        $expected = '{"line":{"d":"200","c":"5","lf":"1","r":[{"from":0,"to":100},{"from":120,"to":140}]},'
-                   .'"msrp":{"d":"100","c":"10","lf":"1","r":[{"from":0,"to":150},{"from":200,"to":250}]}}';
+        $expected = '{"line":{"d":"200","c":"5","lf":"1","r":[{"f":0,"t":100},{"f":120,"t":140}]},'
+                   .'"msrp":{"d":"100","c":"10","lf":"1","r":[{"f":0,"t":150},{"f":200,"t":250}]}}';
 
         $this->assertJsonStringEqualsJsonString(
             $expected, $this->facetGroup->buildQuery(), 'Group query is not in correct json format'

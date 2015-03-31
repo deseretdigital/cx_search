@@ -146,7 +146,9 @@ class Facet
 
         $ranges = $this->getRanges();
         if (!empty($ranges)) {
-            $query['r'] = $ranges;
+            $query['r'] = array_map(function ($range) {
+                return array('f' => $range['from'], 't' => $range['to']);
+            }, $ranges);
         }
 
         return json_encode(array($fieldName => $query));
