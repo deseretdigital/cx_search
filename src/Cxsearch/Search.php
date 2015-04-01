@@ -130,8 +130,11 @@ class Search
 
     private function _filter($target, $operator, $value, $prefix=null)
     {
-        if (!is_numeric($value)) {
+
+        if (!is_numeric($value)&&!is_array($value)) {
             $value = '"' . $value . '"';
+        } else if(is_array($value)){
+            $value = 'range('.implode(',', $value).')';
         }
 
         $this->_a_qry[] = $this->_prefix("filter({$target}{$operator}{$value})", $prefix);
