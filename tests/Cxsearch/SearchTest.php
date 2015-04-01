@@ -304,4 +304,20 @@ class SearchTest extends \PHPUnit_Framework_TestCase
             $expectedResult
         );
     }
+
+    public function testFilterArrayValue()
+    {
+        // arrange
+        $expected = '?p_aq=filter(category_ids:[1,2,3])';
+        $actual = '';
+
+        // act
+        $search = new Search($this->index);
+        $search->filter('category_ids', array(1,2,3));
+        $search->dump($actual);
+        $actual = urldecode($actual);
+
+        // assert
+        $this->assertEquals($expected, $actual, 'Search should support array values in filters');
+    }
 }
