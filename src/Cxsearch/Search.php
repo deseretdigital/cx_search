@@ -128,9 +128,14 @@ class Search
         return $this;
     }
 
-    private function _filter($target, $operator, $value, $prefix=null)
+    private function _filter($target, $operator, $value, $prefix=null, $quoteValue = true)
     {
-        if (!is_numeric($value)) {
+        if (is_array($value)) {
+            $quoteValue = false;
+            $value = json_encode($value);
+        }
+
+        if ($quoteValue === true && !is_numeric($value)) {
             $value = '"' . $value . '"';
         }
 
@@ -146,6 +151,14 @@ class Search
     public function orFilter($target, $value, $op=':')
     {
         $this->_filter($target, $op, $value, 'OR');
+        return $this;
+    }
+
+    public function filterRange($target, $value, $op=':', $prefix=null)
+    {
+        $value = 'range(' . join(',', $value) . ')';
+        $quoteValue = false;
+        $this->_filter($target, $op, $value, $prefix, $quoteValue);
         return $this;
     }
 
