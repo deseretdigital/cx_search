@@ -154,6 +154,14 @@ class Search
         return $this;
     }
 
+    public function filterRange($target, $value, $op=':', $prefix=null)
+    {
+        $value = 'range(' . join(',', $value) . ')';
+        $quoteValue = false;
+        $this->_filter($target, $op, $value, $prefix, $quoteValue);
+        return $this;
+    }
+
     // Auto Queries/Fields
 
     private function _callQuery($params, $args)

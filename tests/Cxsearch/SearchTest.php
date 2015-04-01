@@ -320,4 +320,20 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         // assert
         $this->assertEquals($expected, $actual, 'Search should support array values in filters');
     }
+
+    public function testFilterRange()
+    {
+        // arrange
+        $expected = '?p_aq=filter(longitude:range(-123,-121.2))';
+        $actual = '';
+
+        // act
+        $search = new Search($this->index);
+        $search->filterRange('longitude', array(-123.0, -121.2));
+        $search->dump($actual);
+        $actual = urldecode($actual);
+
+        // assert
+        $this->assertEquals($expected, $actual, 'Search should support filter ranges');
+    }
 }
