@@ -84,7 +84,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Cxsearch\Search', $search);
 
         $result = "";
-        $expectedString = '?p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}}&p_sm={"msrp":"asc"}&p_lang=en&p_s=1&p_c=4&p_dr=line&p_aq=query("Ford") OR query(scale^2:"1:21") AND query(line:"Classic Cars") AND filter(msrp>20) AND filter(vendor>"bubacar") OR filter(msrp<=40)';
+        $expectedString = '?p_sm={"msrp":"asc"}&p_lang=en&p_s=1&p_c=4&p_dr=line&p_aq=query("Ford") OR query(scale^2:"1:21") AND query(line:"Classic Cars") AND filter(msrp>20) AND filter(vendor>"bubacar") OR filter(msrp<=40)&p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}}';
 
         $search->query('Ford')
             ->orQuery('scale', '1:21', 2)
@@ -246,6 +246,27 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $result,
             $expectedFacetQuery,
+            "Result and expecting strings does not match"
+        );
+    }
+
+    public function testReturnFields()
+    {
+        $retunFields = array ('vendor','line');
+        $returnFieldsQuery = 'p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}},{"fl":["vendor","line"]}';
+        $expectedFieldsQuery = '?p_aq=query("Ford")&' . $returnFieldsQuery;
+        $search = new Search($this->index);
+
+        $search->query('Ford')
+               ->prefixSuffix('description', '<b>', '</b>')
+               ->returnFields($retunFields);
+
+        $search->dump($result);
+        $result = urldecode($result);
+
+        $this->assertEquals(
+            $result,
+            $expectedFieldsQuery,
             "Result and expecting strings does not match"
         );
     }

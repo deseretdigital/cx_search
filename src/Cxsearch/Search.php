@@ -11,6 +11,7 @@ class Search
     private $_qry = array();
     private $_a_qry = array();
     private $_f_qry = "";
+    private $_p_rs = array();
 
     public function __construct($index)
     {
@@ -75,6 +76,16 @@ class Search
         return $this;
     }
 
+    /**
+     * @param array | $fields
+     * @return $this
+     */
+    public function returnFields($fields)
+    {
+        $this->_p_rs[] = json_encode(array('fl'=>$fields));
+        return $this;
+    }
+
     public function prefixSuffix($target, $prefix, $suffix)
     {
         $rs = array(
@@ -85,7 +96,7 @@ class Search
                 )
             )
         );
-        $this->_addQuery('p_rs', json_encode($rs));
+        $this->_p_rs[] = json_encode($rs);
         return $this;
     }
 
@@ -218,6 +229,10 @@ class Search
 
         if (!empty($this->_f_qry)) {
             $this->_addQuery('p_f', $this->_f_qry->buildQuery());
+        }
+
+        if (!empty($this->_p_rs)) {
+            $this->_addQuery('p_rs', implode(',',$this->_p_rs));
         }
 
         $final = array();
