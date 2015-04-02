@@ -253,7 +253,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     public function testReturnFields()
     {
         $retunFields = array ('vendor','line');
-        $returnFieldsQuery = 'p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}}},{"fl":["vendor","line"]}';
+        $returnFieldsQuery = 'p_rs={"hl":{"description":{"p":"<b>","s":"<\/b>"}},"fl":["vendor","line"]}';
         $expectedFieldsQuery = '?p_aq=query("Ford")&' . $returnFieldsQuery;
         $search = new Search($this->index);
 
