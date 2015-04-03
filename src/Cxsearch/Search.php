@@ -163,6 +163,12 @@ class Search
         return $this;
     }
 
+    public function andNotFilter($target, $value, $op=':')
+    {
+        $this->_filter($target, $op, $value, 'AND NOT');
+        return $this;
+    }
+
     public function filterRange($target, $value, $op=':', $prefix=null)
     {
         $value = 'range(' . join(',', $value) . ')';
