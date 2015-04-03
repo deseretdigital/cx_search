@@ -336,4 +336,22 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         // assert
         $this->assertEquals($expected, $actual, 'Search should support filter ranges');
     }
+
+    public function testAndNotFilter()
+    {
+        // arrange
+        $expected = '?p_aq=query("test") AND filter(rating:1) AND NOT filter(id:[1,2])';
+        $actual = '';
+
+        // act
+        $search = new Search($this->index);
+        $search->query("test");
+        $search->filter("rating",1);
+        $search->andNotFilter("id",array(1,2));
+        $search->dump($actual);
+        $actual = urldecode($actual);
+
+        // assert
+        $this->assertEquals($expected, $actual, 'Search should OR operator');
+    }
 }
