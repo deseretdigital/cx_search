@@ -82,21 +82,19 @@ class Search
      */
     public function returnFields($fields)
     {
-        $this->_p_rs[] = json_encode(array('fl'=>$fields));
+        $this->_p_rs['fl'] = $fields;
         return $this;
     }
 
     public function prefixSuffix($target, $prefix, $suffix)
     {
         $rs = array(
-            'hl' => array(
                 $target => array(
                     'p' => $prefix,
                     's' => $suffix
                 )
-            )
         );
-        $this->_p_rs[] = json_encode($rs);
+        $this->_p_rs['hl'] = $rs;
         return $this;
     }
 
@@ -232,7 +230,7 @@ class Search
         }
 
         if (!empty($this->_p_rs)) {
-            $this->_addQuery('p_rs', implode(',',$this->_p_rs));
+            $this->_addQuery('p_rs', json_encode($this->_p_rs));
         }
 
         $final = array();
