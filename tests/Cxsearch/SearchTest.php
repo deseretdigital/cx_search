@@ -100,7 +100,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
             ->duplicateRemoval('line')
             ->dump($result);
         $result = urldecode($result);
-        $this->assertEquals($result, $expectedString);
+        $this->assertEquals($expectedString,$result);
     }
 
     /**
@@ -244,8 +244,8 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $result = urldecode($result);
 
         $this->assertEquals(
-            $result,
             $expectedFacetQuery,
+            $result,
             "Result and expecting strings does not match"
         );
     }
@@ -300,8 +300,8 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $actualResult = urldecode($actualResult);
 
         $this->assertEquals(
-            $actualResult,
-            $expectedResult
+            $expectedResult,
+            $actualResult
         );
     }
 
