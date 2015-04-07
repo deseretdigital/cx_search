@@ -61,6 +61,6 @@ class Result implements \Iterator
 
     public function getFacets()
     {
-        return $this->raw->facets;
+        return json_decode(json_encode($this->raw->facets), true);
     }
 }
