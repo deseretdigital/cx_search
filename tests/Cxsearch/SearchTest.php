@@ -162,6 +162,17 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @depends testRunSearch
+     * @covers Cxsearch\Search\Match::toArray
+     */
+    public function testMatchToArray($result)
+    {
+        $result->rewind();
+        $match = $result->current();
+        $this->assertTrue(is_array($match->toArray()), 'Conversion to array is not working');
+    }
+
+    /**
      * @covers Cxsearch\Search::run
      */
     public function testRunSearchFalse()
