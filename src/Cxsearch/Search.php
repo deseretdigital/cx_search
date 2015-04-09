@@ -259,8 +259,15 @@ class Search
         $result = $query;
     }
 
-    public function run(&$result)
+    /**
+     * @expectedException PHPUnit_Framework_Error
+     */
+    public function run(&$result = null)
     {
+        if (count(func_get_args()) > 0) {
+          trigger_error('Use return value instead of &$result passed by reference.', E_USER_DEPRECATED);
+        }
+
         $query = $this->_buildQuery();
 
         $browser = $this->_index->getBrowser();
@@ -274,6 +281,8 @@ class Search
         }
         $data = json_decode($response->getContent());
         $result = new Result($this->_index, $data);
+
+        return $result;
     }
 }
 
