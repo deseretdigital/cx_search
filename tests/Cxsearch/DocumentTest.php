@@ -241,6 +241,22 @@ class DocumentTest extends \PHPUnit_Framework_TestCase
         $doc = Document::load($this->index, $id);
         $doc->addField($field, $value);
 
-        $this->assertEquals($doc->__get($field), $value, 'Adding new field is not working');
+        $this->assertEquals($doc->{$field}, $value, 'Adding new field is not working');
+    }
+
+    /**
+     * @covers Cxsearch\Document::addField
+     */
+    public function testAddFieldAgain()
+    {
+        $id = 'S18_4933';
+        $field = 'new_field';
+        $value = 'test_value';
+
+        $doc = Document::load($this->index, $id);
+        $doc->addField($field, $value);
+        $actual = $doc->addField($field, $value);
+
+        $this->assertFalse($actual, 'Adding field again should not be permitted');
     }
 }
