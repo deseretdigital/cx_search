@@ -187,4 +187,13 @@ class Document
 
         return $response->isSuccessful();
     }
+
+    public function addField($name, $value)
+    {
+        if (isset($this->_data->fields->{$name})) {
+            return false;
+        }
+        $this->_data->fields->{$name} = $value;
+        return true;
+    }
 }
