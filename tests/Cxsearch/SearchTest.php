@@ -112,12 +112,12 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     public function testRunSearch()
     {
         $search = new Search($this->index);
-        $search->query('Ford')
+        $result = $search->query('Ford')
             ->andQueryByLine('Classic Cars')
             ->andFilterByMsrpGT(20)
             ->prefixSuffix('description', '<b>', '</b>')
             ->sort(array('msrp' => 'asc'))
-            ->run($result);
+            ->run();
 
         $this->assertInstanceOf('Cxsearch\Search\Result', $result);
 
@@ -168,14 +168,14 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     {
         $index = $this->getCxIndex(FALSE);
         $search = new Search($index);
-        $rs = $search->query('Ford')
+        $result = $search->query('Ford')
             ->andQueryByLine('Classic Cars')
             ->andFilterByMsrpGT(20)
             ->prefixSuffix('description', '<b>', '</b>')
             ->sort(array('msrp' => 'asc'))
-            ->run($result);
+            ->run();
 
-        $this->assertFalse($rs);
+        $this->assertFalse($result);
     }
 
    /**
@@ -222,7 +222,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     {
         $index = $this->getCxIndex(TRUE, '_all');
 
-        $index->newSearch()->query('ford')->run($foo);
+        $result = $index->newSearch()->query('ford')->run();
     }
 
     public function testAddFacetGroup()
@@ -356,5 +356,23 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
         // assert
         $this->assertEquals($expected, $actual, 'Search should support filter ranges');
+    }
+
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     */
+    public function testResultPassByReferenceBackwardCompatibility() {
+      $search = new Search($this->index);
+      $search->query('Ford')
+          ->andQueryByLine('Classic Cars')
+          ->andFilterByMsrpGT(20)
+          ->prefixSuffix('description', '<b>', '</b>')
+          ->sort(array('msrp' => 'asc'))
+          ->run($result);
+
+      $this->assertInstanceOf('Cxsearch\Search\Result', $result);
+
+      return $result;
     }
 }
