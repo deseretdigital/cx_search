@@ -6,7 +6,7 @@ use Cxsearch\Document;
 use Cxsearch\Index;
 
 /**
-* 
+*
 */
 class Match
 {
@@ -18,7 +18,7 @@ class Match
     public $doc;
     public $sort;
 
-    function __construct($index, $match)
+    public function __construct($index, $match)
     {
         $this->index = $index;
         $this->match = $match;
@@ -26,7 +26,7 @@ class Match
         if ($index->getId() != $match->index) {
             $this->index = new Index($index->getConfiguration(), $match->index);
         }
-        
+
         $this->doc = Document::materialize($this->index, $match->document);
 
         $this->score = $match->score;
@@ -37,5 +37,19 @@ class Match
     public function getIndex()
     {
         return $this->index;
+    }
+
+    public function toArray()
+    {
+
+        $data = array(
+            'index'      => $this->index->getId(),
+            'document'   => json_decode(json_encode($this->doc->getData()), true),
+            'score'      => $this->score,
+            'sortValues' => $this->sort,
+            'highlights' => $this->highlights
+        );
+
+        return $data;
     }
 }
