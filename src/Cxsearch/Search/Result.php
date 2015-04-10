@@ -63,4 +63,23 @@ class Result implements \Iterator
     {
         return $this->raw->facets;
     }
+
+    /**
+     * Serialize Result object
+     * @return array Returns array representation of Result object
+     */
+    public function toArray()
+    {
+        $matches = array_map(function($match) {
+            return $match->toArray();
+        }, $this->matches);
+
+        return array(
+            'matches' => $matches,
+            'start' => $this->getStart(),
+            'totalMatched'=> $this->length(),
+            'annotations' => json_decode(json_encode($this->raw->annotations), true),
+            'facets' => json_decode(json_encode($this->getFacets()), true)
+        );
+    }
 }

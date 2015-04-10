@@ -14,7 +14,7 @@ class SearchTest extends \PHPUnit_Framework_TestCase
     {
         $this->getDef_response = '{"documentCount":206,"operationCount":18,"name":"birt","configuration":{"index":{"number_of_replicas":0,"number_of_shards":1},"fields":{"scale":{"indexOps":"facet","type":"string"},"msrp":{"indexOps":"facet","type":"double"},"vendor":{"indexOps":"sort,facet","resultCfg":"hl","type":"string"},"line":{"indexOps":"facet,sort","type":"string"}}},"aliases":[]}';
 
-        $this->getContent_response = '{"matches":[{"index":"birt","document":{"fields":{"scale":"1:12","msrp":"136.67","vendor":"Welly Diecast Productions","description":"Model features 30 windows, skylights & glare resistant glass, working steering system, original logos","name":"1958 Setra Bus","line":"Trucks and Buses","seqnum":8},"id":"S12_1666","version":1},"score":1.0,"sortValues":[]},{"index":"birt","document":{"fields":{"scale":"1:18","msrp":"142.25","vendor":"Min Lin Diecast","description":"This model features, opening hood, opening doors, detailed engine, rear spoiler, opening trunk, working steering, tinted windows, baked enamel finish. Color yellow.","name":"1995 Honda Civic","line":"Classic Cars","seqnum":24},"id":"S18_1984","version":1},"score":1.0,"sortValues":[]},{"index":"birt","document":{"fields":{"scale":"1:18","msrp":"62.17","vendor":"Studio M Art Models","description":"Features rotating wheels , working kick stand. Comes with stand.","name":"1957 Vespa GS150","line":"Motorcycles","seqnum":44},"id":"S18_3782","version":1},"score":1.0,"sortValues":[]}],"start":0,"totalMatched":3,"annotations":{},"facets":{}}';
+        $this->getContent_response = '{"matches":[{"index":"birt","document":{"fields":{"scale":"1:12","msrp":"136.67","vendor":"Welly Diecast Productions","description":"Model features 30 windows, skylights & glare resistant glass, working steering system, original logos","name":"1958 Setra Bus","line":"Trucks and Buses","seqnum":8},"id":"S12_1666","version":1},"score":1.0,"sortValues":[]},{"index":"birt","document":{"fields":{"scale":"1:18","msrp":"142.25","vendor":"Min Lin Diecast","description":"This model features, opening hood, opening doors, detailed engine, rear spoiler, opening trunk, working steering, tinted windows, baked enamel finish. Color yellow.","name":"1995 Honda Civic","line":"Classic Cars","seqnum":24},"id":"S18_1984","version":1},"score":1.0,"sortValues":[]},{"index":"birt","document":{"fields":{"scale":"1:18","msrp":"62.17","vendor":"Studio M Art Models","description":"Features rotating wheels , working kick stand. Comes with stand.","name":"1957 Vespa GS150","line":"Motorcycles","seqnum":44},"id":"S18_3782","version":1},"score":1.0,"sortValues":[]}],"start":0,"totalMatched":3,"annotations":{},"facets":{"vendor":[{"label":"Model Cars Inc","count":10},{"label":"Classic Metal Creations","count":10}]}}';
 
         $this->baseUrl = 'http://sandbox.cxsearch.cxense.com';
 
@@ -176,6 +176,29 @@ class SearchTest extends \PHPUnit_Framework_TestCase
 
         // act
         $actual = $result->current()->toArray();
+
+        // assert
+        $this->assertEquals($expected, $actual, 'Conversion to array is not working');
+    }
+
+    /**
+     * @depends testRunSearch
+     * @covers Cxsearch\Search\Match::toArray
+     */
+    public function testResultToArray($result)
+    {
+        // arrange
+        $content = json_decode($this->getContent_response, true);
+        foreach ($content['matches'] as $key => $match) {
+            $match['highlights'] = null;
+            $content['matches'][$key] = $match;
+        }
+        $expected = $content;
+
+        $result->rewind();
+
+        // act
+        $actual = $result->toArray();
 
         // assert
         $this->assertEquals($expected, $actual, 'Conversion to array is not working');
