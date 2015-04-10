@@ -167,9 +167,18 @@ class SearchTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchToArray($result)
     {
+        // arrange
+        $content = json_decode($this->getContent_response, true);
+        $expected = $content['matches'][0];
+        $expected['highlights'] = null;
+
         $result->rewind();
-        $match = $result->current();
-        $this->assertTrue(is_array($match->toArray()), 'Conversion to array is not working');
+
+        // act
+        $actual = $result->current()->toArray();
+
+        // assert
+        $this->assertEquals($expected, $actual, 'Conversion to array is not working');
     }
 
     /**

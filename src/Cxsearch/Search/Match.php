@@ -41,6 +41,15 @@ class Match
 
     public function toArray()
     {
-        return json_decode(json_encode($this->doc->getData()->fields), true);
+
+        $data = array(
+            'index'      => $this->index->getId(),
+            'document'   => json_decode(json_encode($this->doc->getData()), true),
+            'score'      => $this->score,
+            'sortValues' => $this->sort,
+            'highlights' => $this->highlights
+        );
+
+        return $data;
     }
 }
