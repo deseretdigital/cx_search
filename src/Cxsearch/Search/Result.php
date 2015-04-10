@@ -63,4 +63,17 @@ class Result implements \Iterator
     {
         return $this->raw->facets;
     }
+
+    public function getFacetByName($facetName)
+    {
+        if (!isset($this->raw->facets->{$facetName})) {
+            return false;
+        };
+        $values = $this->raw->facets->{$facetName};
+        foreach ($values as $value) {
+            $result[] = get_object_vars($value);
+        }
+
+        return $result;
+    }
 }
