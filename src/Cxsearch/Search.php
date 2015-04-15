@@ -2,7 +2,6 @@
 
 namespace Cxsearch;
 
-use Cxsearch\FacetGroup\FacetGroup;
 use Cxsearch\Search\Result;
 
 class Search
@@ -10,8 +9,6 @@ class Search
     private $_index;
     private $_qry = array();
     private $_a_qry = array();
-    private $_f_qry = "";
-    private $_p_rs = array();
 
     public function __construct($index)
     {
@@ -56,45 +53,17 @@ class Search
         return $this;
     }
 
-    /**
-     * @param array | FacetGroup $fields
-     * @return $this
-     */
-    public function addFacetGroup($fields)
-    {
-        if (is_array($fields)) {
-            $facetGroup = new FacetGroup();
-            foreach($fields as $field) {
-                $facetGroup->newFacet($field);
-            }
-        } else {
-            $facetGroup = $fields;
-        }
-
-        $this->_f_qry = $facetGroup;
-
-        return $this;
-    }
-
-    /**
-     * @param array | $fields
-     * @return $this
-     */
-    public function returnFields($fields)
-    {
-        $this->_p_rs['fl'] = $fields;
-        return $this;
-    }
-
     public function prefixSuffix($target, $prefix, $suffix)
     {
         $rs = array(
+            'hl' => array(
                 $target => array(
                     'p' => $prefix,
                     's' => $suffix
                 )
+            )
         );
-        $this->_p_rs['hl'] = $rs;
+        $this->_addQuery('p_rs', json_encode($rs));
         return $this;
     }
 
@@ -107,7 +76,7 @@ class Search
         return trim($prefix . $cmd);
     }
 
-    private function _query($target, $value=null, $boost=null, $prefix='AND')
+    private function _query($target, $value=null, $boost=null, $prefix='AND', $tokenOp=null)
     {
         if (is_null($value)) {
             $value = $target;
@@ -122,12 +91,16 @@ class Search
             $value = '"' . $value . '"';
         }
 
+        if (!is_null($tokenOp)) {
+            $value .= ", token-op=".$tokenOp;
+        }
+
         $this->_a_qry[] = $this->_prefix("query({$value})", $prefix);
     }
 
-    public function query($target, $value=null, $boost=null, $prefix=null)
+    public function query($target, $value=null, $boost=null, $prefix=null, $tokenOp=null)
     {
-        $this->_query($target, $value, $boost, $prefix);
+        $this->_query($target, $value, $boost, $prefix, $tokenOp=null);
         return $this;
     }
 
@@ -137,14 +110,9 @@ class Search
         return $this;
     }
 
-    private function _filter($target, $operator, $value, $prefix=null, $quoteValue = true)
+    private function _filter($target, $operator, $value, $prefix=null)
     {
-        if (is_array($value)) {
-            $quoteValue = false;
-            $value = json_encode($value);
-        }
-
-        if ($quoteValue === true && !is_numeric($value)) {
+        if (!is_numeric($value)) {
             $value = '"' . $value . '"';
         }
 
@@ -160,14 +128,6 @@ class Search
     public function orFilter($target, $value, $op=':')
     {
         $this->_filter($target, $op, $value, 'OR');
-        return $this;
-    }
-
-    public function filterRange($target, $value, $op=':', $prefix=null)
-    {
-        $value = 'range(' . join(',', $value) . ')';
-        $quoteValue = false;
-        $this->_filter($target, $op, $value, $prefix, $quoteValue);
         return $this;
     }
 
@@ -225,26 +185,16 @@ class Search
         // Add Advanced Query
         $this->_addQuery('p_aq', join($this->_a_qry, ' '));
 
-        if (!empty($this->_f_qry)) {
-            $this->_addQuery('p_f', $this->_f_qry->buildQuery());
-        }
-
-        if (!empty($this->_p_rs)) {
-            $this->_addQuery('p_rs', json_encode($this->_p_rs));
-        }
-
         $final = array();
+
         foreach ($this->_qry as $key => $value) {
-            $final[$key] = $value;
+            if ($encode) {
+                $value = urlencode($value);
+            }
+            $final[] = $key . '=' . $value;
         }
 
-        $queryString = '?' . http_build_query($final);
-
-        if (!$encode) {
-            $queryString = urldecode($queryString);
-        }
-
-        return $queryString;
+        return '?' . join($final, '&');
     }
 
     public function dump(&$result=FALSE)
@@ -259,15 +209,8 @@ class Search
         $result = $query;
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function run(&$result = null)
+    public function run(&$result)
     {
-        if (count(func_get_args()) > 0) {
-          trigger_error('Use return value instead of &$result passed by reference.', E_USER_DEPRECATED);
-        }
-
         $query = $this->_buildQuery();
 
         $browser = $this->_index->getBrowser();
@@ -279,10 +222,9 @@ class Search
             $result = $response->getContent();
             return FALSE;
         }
+
         $data = json_decode($response->getContent());
         $result = new Result($this->_index, $data);
-
-        return $result;
     }
 }
 
