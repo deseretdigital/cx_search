@@ -259,4 +259,23 @@ class DocumentTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($actual, 'Adding field again should not be permitted');
     }
+
+    /**
+     * @depends testLoad
+     * @covers Cxsearch\Document::save
+     */
+    public function testToArray($raw)
+    {
+        // arrange
+        $index = $this->getCxIndex(FALSE);
+
+        $doc = Document::materialize($index, $raw);
+        $expected = json_decode(json_encode($raw),true);
+
+        // act
+        $actual = $doc->toArray();
+
+        // assert
+        $this->assertEquals($expected, $actual);
+    }
 }

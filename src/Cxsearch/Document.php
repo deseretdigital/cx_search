@@ -196,4 +196,10 @@ class Document
         $this->_data->fields->{$name} = $value;
         return true;
     }
+
+    public function toArray()
+    {
+        return json_decode(json_encode($this->getData()), true);
+
+    }
 }
