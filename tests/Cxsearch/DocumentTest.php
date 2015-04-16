@@ -262,7 +262,7 @@ class DocumentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testLoad
-     * @covers Cxsearch\Document::save
+     * @covers Cxsearch\Document::toArray
      */
     public function testToArray($raw)
     {
