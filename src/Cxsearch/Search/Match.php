@@ -44,7 +44,7 @@ class Match
 
         $data = array(
             'index'      => $this->index->getId(),
-            'document'   => json_decode(json_encode($this->doc->getData()), true),
+            'document'   => $this->doc->toArray(),
             'score'      => $this->score,
             'sortValues' => $this->sort,
             'highlights' => $this->highlights
