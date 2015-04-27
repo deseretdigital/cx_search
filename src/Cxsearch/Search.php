@@ -119,9 +119,9 @@ class Search
         $this->_a_qry[] = $this->_prefix("filter({$target}{$operator}{$value})", $prefix);
     }
 
-    public function filter($target, $value, $op=':', $prefix=null)
+    public function filter($target, $value, $op=':', $prefix=null, $quoteValue = true)
     {
-        $this->_filter($target, $op, $value, $prefix);
+        $this->_filter($target, $op, $value, $prefix, $quoteValue);
         return $this;
     }
 
