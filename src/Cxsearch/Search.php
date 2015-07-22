@@ -171,6 +171,11 @@ class Search
         return $this;
     }
 
+    public function customExpression($expression)
+    {
+        $this->_a_qry[] = $expression;
+    }
+
     // Auto Queries/Fields
 
     private function _callQuery($params, $args)
