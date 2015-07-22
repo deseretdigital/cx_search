@@ -401,6 +401,23 @@ class SearchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual, 'Search should support filter ranges');
     }
 
+    public function testCustomExpression()
+    {
+        // arrange
+        $expected = '?p_aq=filter(longitude:range(-123,-121.2)) AND ((filter(latitude:range(40.4759,40.7652)) AND filter(longitude:range(-111.9966,-111.6154))) OR filter(region_ids:6))';
+        $actual = '';
+
+        // act
+        $search = new Search($this->index);
+        $search->filterRange('longitude', array(-123.0, -121.2));
+        $search->customExpression('AND ((filter(latitude:range(40.4759,40.7652)) AND filter(longitude:range(-111.9966,-111.6154))) OR filter(region_ids:6))');
+        $search->dump($actual);
+        $actual = urldecode($actual);
+
+        // assert
+        $this->assertEquals($expected, $actual, 'Search should support custom expression');
+    }
+
 
     /**
      * @expectedException PHPUnit_Framework_Error_Deprecated
