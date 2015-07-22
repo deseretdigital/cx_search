@@ -152,7 +152,7 @@ class Document
         if ($this->_is_new) {
             $data = json_encode(array('fields' => $this->_new_data->fields));
             $response = $browser->post($url, array(), $data);
-            
+
             if ($response->isSuccessful()) {
                 $this->_saved();
                 return TRUE;
@@ -165,7 +165,7 @@ class Document
         $data = json_encode(array('fields' => $data));
 
         $response = $browser->post($url, array(), $data);
-        
+
         if ($response->isSuccessful()) {
             $this->_saved();
             return TRUE;
@@ -186,5 +186,20 @@ class Document
         $response = $browser->delete($url);
 
         return $response->isSuccessful();
+    }
+
+    public function addField($name, $value)
+    {
+        if (isset($this->_data->fields->{$name})) {
+            return false;
+        }
+        $this->_data->fields->{$name} = $value;
+        return true;
+    }
+
+    public function toArray()
+    {
+        return json_decode(json_encode($this->getData()), true);
+
     }
 }
